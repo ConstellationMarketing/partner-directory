@@ -1,0 +1,385 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import PartnerSidebar from '../components/PartnerSidebar.astro';
+
+export async function getStaticPaths() {
+  const partners = await getCollection('partners');
+  return partners.map(partner => ({
+    params: { slug: partner.id },
+    props: { partner },
+  }));
+}
+
+const { partner } = Astro.props;
+const { Content } = await render(partner);
+
+// Get related partners (same type, excluding current)
+const allPartners = await getCollection('partners');
+const relatedPartners = allPartners
+  .filter(p => p.id !== partner.id && p.data.partnerType === partner.data.partnerType && p.data.status === 'active')
+  .slice(0, 3)
+  .map(p => ({ name: p.data.name, slug: p.id, partnerType: p.data.partnerType }));
+
+const { name, website, industry, partnerType, location, shortDescription, featured, status, logo, tags, faqs } = partner.data;
+---
+
+<BaseLayout
+  title={`${name} | Constellation Partner Directory`}
+  description={shortDescription}
+>
+  <Header />
+
+  <!-- Partner Hero -->
+  <section class="partner-hero">
+    <div class="container">
+      <a href="/" class="back-link">← Back to Directory</a>
+      <div class="partner-hero-content">
+        {logo ? (
+          <img src={logo} alt={`${name} logo`} class="partner-hero-logo" />
+        ) : (
+          <div class="hero-logo-placeholder">
+            <span>{name.charAt(0)}</span>
+          </div>
+        )}
+        <div class="partner-hero-info">
+          <div class="hero-badges">
+            {featured && <span class="badge badge-featured">⭐ Featured Partner</span>}
+            <span class:list={['badge', status === 'active' ? 'badge-active' : 'badge-inactive']}>
+              {status === 'active' ? '✓ Active Partner' : 'Inactive'}
+            </span>
+          </div>
+          <h1>{name}</h1>
+          <p class="hero-desc">{shortDescription}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Info Bar -->
+  <section class="info-bar">
+    <div class="container">
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Industry</span>
+          <span class="info-value">{industry.join(', ')}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Partner Type</span>
+          <span class="info-value">{partnerType}</span>
+        </div>
+        {location && (
+          <div class="info-item">
+            <span class="info-label">Location</span>
+            <span class="info-value">{location}</span>
+          </div>
+        )}
+        <div class="info-item">
+          <span class="info-label">Website</span>
+          <a href={website} target="_blank" rel="noopener" class="info-link">{new URL(website).hostname} ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <section class="partner-body">
+    <div class="container">
+      <div class="two-column">
+        <!-- Left: Main Content -->
+        <div class="partner-main">
+          <!-- About -->
+          <div class="content-block">
+            <div class="partner-content prose">
+              <Content />
+            </div>
+          </div>
+
+          <!-- Tags -->
+          {tags.length > 0 && (
+            <div class="content-block">
+              <h3>Tags</h3>
+              <div class="tag-list">
+                {tags.map(tag => <span class="tag">{tag}</span>)}
+              </div>
+            </div>
+          )}
+
+          <!-- FAQ -->
+          {faqs.length > 0 && (
+            <div class="content-block">
+              <h3>Frequently Asked Questions</h3>
+              <div class="faq-list">
+                {faqs.map((faq, i) => (
+                  <details class="faq-item" open={i === 0}>
+                    <summary>{faq.question}</summary>
+                    <p>{faq.answer}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <!-- Right: Sidebar -->
+        <div class="partner-sidebar-col">
+          <PartnerSidebar
+            website={website}
+            partnerName={name}
+            relatedPartners={relatedPartners}
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+.partner-hero {
+  background: linear-gradient(135deg, var(--dark) 0%, #16213e 100%);
+  color: #fff;
+  padding: 48px 0 40px;
+}
+
+.back-link {
+  display: inline-block;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+  transition: color 0.2s;
+}
+.back-link:hover { color: var(--green); }
+
+.partner-hero-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+}
+
+.partner-hero-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.1);
+  padding: 8px;
+  flex-shrink: 0;
+}
+
+.hero-logo-placeholder {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--green), #2ea3f2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.hero-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: var(--font-heading);
+}
+
+.badge-featured { background: rgba(79,188,133,0.2); color: var(--green); border: 1px solid rgba(79,188,133,0.4); }
+.badge-active { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.85); }
+.badge-inactive { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.5); }
+
+.partner-hero-info h1 {
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+}
+
+.hero-desc {
+  color: rgba(255,255,255,0.7);
+  font-size: 1rem;
+  line-height: 1.7;
+  max-width: 600px;
+}
+
+/* Info Bar */
+.info-bar {
+  background: #fff;
+  border-bottom: 1px solid var(--gray-200);
+  padding: 20px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.info-grid {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  font-size: 0.95rem;
+  color: var(--gray-900);
+  font-weight: 500;
+}
+
+.info-link {
+  font-size: 0.95rem;
+  color: var(--green);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.info-link:hover { color: #3da872; }
+
+/* Body */
+.partner-body { padding: 56px 0 80px; }
+
+.two-column {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 40px;
+  align-items: start;
+}
+
+.content-block {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--gray-200);
+  padding: 28px 32px;
+  margin-bottom: 24px;
+}
+
+.content-block h3 {
+  font-size: 1.1rem;
+  color: var(--gray-900);
+  margin-bottom: 16px;
+}
+
+/* Prose styles */
+.prose :global(h2) {
+  font-size: 1.3rem;
+  color: var(--gray-900);
+  margin: 24px 0 12px;
+  font-family: var(--font-heading);
+}
+
+.prose :global(h3) {
+  font-size: 1.1rem;
+  color: var(--gray-700);
+  margin: 20px 0 10px;
+  font-family: var(--font-heading);
+}
+
+.prose :global(p) {
+  color: var(--gray-700);
+  line-height: 1.75;
+  margin-bottom: 14px;
+}
+
+.prose :global(ul), .prose :global(ol) {
+  padding-left: 24px;
+  margin-bottom: 14px;
+  color: var(--gray-700);
+}
+
+.prose :global(li) { margin-bottom: 6px; line-height: 1.6; }
+
+/* Tags */
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  background: var(--gray-100);
+  color: var(--gray-700);
+  padding: 5px 14px;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-family: var(--font-heading);
+  border: 1px solid var(--gray-200);
+}
+
+/* FAQ */
+.faq-list { display: flex; flex-direction: column; gap: 12px; }
+
+.faq-item {
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.faq-item summary {
+  padding: 14px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  color: var(--gray-900);
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--gray-100);
+  transition: background 0.2s;
+}
+
+.faq-item summary:hover { background: rgba(79,188,133,0.08); }
+.faq-item[open] summary { color: var(--green); }
+
+.faq-item summary::after { content: '+'; font-size: 1.2rem; color: var(--green); }
+.faq-item[open] summary::after { content: '−'; }
+
+.faq-item p {
+  padding: 16px;
+  color: var(--gray-700);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.partner-sidebar-col {
+  position: sticky;
+  top: 80px;
+}
+
+@media (max-width: 900px) {
+  .two-column { grid-template-columns: 1fr; }
+  .partner-sidebar-col { position: static; }
+  .partner-hero-content { flex-direction: column; gap: 16px; }
+}
+
+@media (max-width: 600px) {
+  .partner-hero-info h1 { font-size: 1.7rem; }
+  .info-grid { gap: 16px; }
+}
+</style>

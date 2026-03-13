@@ -1,0 +1,182 @@
+---
+interface Props {
+  slug: string;
+  name: string;
+  shortDescription: string;
+  partnerType: string;
+  industry: string[];
+  location?: string;
+  featured?: boolean;
+  status?: string;
+  logo?: string;
+  tags?: string[];
+}
+
+const { slug, name, shortDescription, partnerType, industry, location, featured = false, status = 'active', logo, tags = [] } = Astro.props;
+---
+
+<article
+  class:list={['partner-card', { featured }]}
+  data-name={name.toLowerCase()}
+  data-type={partnerType.toLowerCase()}
+  data-industry={industry.join(',').toLowerCase()}
+>
+  <a href={`/${slug}`} class="card-link">
+    <div class="card-header">
+      {logo ? (
+        <img src={logo} alt={`${name} logo`} class="partner-logo" />
+      ) : (
+        <div class="logo-placeholder">
+          <span>{name.charAt(0)}</span>
+        </div>
+      )}
+      <div class="card-badges">
+        {featured && <span class="badge badge-featured">Featured</span>}
+        <span class:list={['badge', status === 'active' ? 'badge-active' : 'badge-inactive']}>
+          {status === 'active' ? 'Active' : 'Inactive'}
+        </span>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <h3 class="partner-name">{name}</h3>
+      <p class="partner-desc">{shortDescription}</p>
+    </div>
+
+    <div class="card-footer">
+      <span class="partner-type">{partnerType}</span>
+      {location && <span class="partner-location">📍 {location}</span>}
+    </div>
+
+    {tags.length > 0 && (
+      <div class="card-tags">
+        {tags.slice(0, 3).map(tag => (
+          <span class="tag">{tag}</span>
+        ))}
+      </div>
+    )}
+  </a>
+</article>
+
+<style>
+.partner-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--gray-200);
+  transition: all 0.25s;
+  overflow: hidden;
+}
+
+.partner-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-green);
+  border-left: 3px solid var(--green);
+}
+
+.partner-card.featured {
+  border-top: 3px solid var(--green);
+}
+
+.card-link {
+  display: block;
+  padding: 24px;
+  height: 100%;
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.partner-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.logo-placeholder {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--green), #2ea3f2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+.card-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.badge {
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-heading);
+}
+
+.badge-featured { background: rgba(79,188,133,0.15); color: var(--green); }
+.badge-active { background: rgba(46,163,242,0.12); color: #1d7cb8; }
+.badge-inactive { background: var(--gray-100); color: var(--gray-500); }
+
+.card-body { margin-bottom: 16px; }
+
+.partner-name {
+  font-size: 1.05rem;
+  color: var(--gray-900);
+  margin-bottom: 8px;
+}
+
+.partner-desc {
+  font-size: 0.88rem;
+  color: var(--gray-500);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  margin-bottom: 12px;
+}
+
+.partner-type {
+  color: var(--green);
+  font-weight: 600;
+  font-family: var(--font-heading);
+}
+
+.partner-location { color: var(--gray-500); }
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  background: var(--gray-100);
+  color: var(--gray-700);
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-family: var(--font-heading);
+}
+</style>

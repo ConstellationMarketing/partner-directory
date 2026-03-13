@@ -1,0 +1,444 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import PartnerCard from '../components/PartnerCard.astro';
+
+const allPartners = await getCollection('partners');
+const activePartners = allPartners.filter(p => p.data.status === 'active');
+const featuredPartners = activePartners.filter(p => p.data.featured);
+const regularPartners = activePartners.filter(p => !p.data.featured);
+
+const totalPartners = activePartners.length;
+const allTypes = [...new Set(activePartners.map(p => p.data.partnerType))];
+const allIndustries = [...new Set(activePartners.flatMap(p => p.data.industry))];
+
+// Partner type tiles for Browse by Category
+const typeStats = allTypes.map(type => ({
+  type,
+  count: activePartners.filter(p => p.data.partnerType === type).length,
+}));
+---
+
+<BaseLayout
+  title="Partner Directory | Constellation Marketing"
+  description="Explore Constellation Marketing's trusted network of partners — technology providers, referral partners, and strategic allies driving results for law firms."
+>
+  <Header />
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge">Constellation Partner Network</div>
+        <h1>Our Trusted Partners</h1>
+        <p class="hero-sub">A curated network of technology providers, referral partners, and strategic allies that help Constellation deliver exceptional results for law firms and professional services companies.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-number">{totalPartners}</span>
+          <span class="stat-label">Total Partners</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number">{activePartners.length}</span>
+          <span class="stat-label">Active</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number">{featuredPartners.length}</span>
+          <span class="stat-label">Featured</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Partners -->
+  {featuredPartners.length > 0 && (
+    <section class="section featured-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Featured Partners</h2>
+          <p>Cornerstone relationships that define our partner network</p>
+        </div>
+        <div class="featured-grid">
+          {featuredPartners.map(partner => (
+            <PartnerCard
+              slug={partner.id}
+              name={partner.data.name}
+              shortDescription={partner.data.shortDescription}
+              partnerType={partner.data.partnerType}
+              industry={partner.data.industry}
+              location={partner.data.location}
+              featured={partner.data.featured}
+              status={partner.data.status}
+              logo={partner.data.logo}
+              tags={partner.data.tags}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Directory with Search & Filter -->
+  <section class="section directory-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>All Partners</h2>
+        <p>Search and filter to find the right partner</p>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="filter-bar">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search partners..."
+          class="search-input"
+          autocomplete="off"
+        />
+        <select id="typeFilter" class="filter-select">
+          <option value="">All Partner Types</option>
+          {allTypes.map(type => <option value={type.toLowerCase()}>{type}</option>)}
+        </select>
+        <select id="industryFilter" class="filter-select">
+          <option value="">All Industries</option>
+          {allIndustries.map(ind => <option value={ind.toLowerCase()}>{ind}</option>)}
+        </select>
+        <span id="resultCount" class="result-count">{activePartners.length} partners</span>
+      </div>
+
+      <!-- Partner Grid -->
+      <div class="partners-grid" id="partnersGrid">
+        {featuredPartners.map(partner => (
+          <PartnerCard
+            slug={partner.id}
+            name={partner.data.name}
+            shortDescription={partner.data.shortDescription}
+            partnerType={partner.data.partnerType}
+            industry={partner.data.industry}
+            location={partner.data.location}
+            featured={partner.data.featured}
+            status={partner.data.status}
+            logo={partner.data.logo}
+            tags={partner.data.tags}
+          />
+        ))}
+        {regularPartners.map(partner => (
+          <PartnerCard
+            slug={partner.id}
+            name={partner.data.name}
+            shortDescription={partner.data.shortDescription}
+            partnerType={partner.data.partnerType}
+            industry={partner.data.industry}
+            location={partner.data.location}
+            featured={partner.data.featured}
+            status={partner.data.status}
+            logo={partner.data.logo}
+            tags={partner.data.tags}
+          />
+        ))}
+      </div>
+
+      <div id="noResults" class="no-results" style="display:none;">
+        <p>No partners found matching your search. Try adjusting your filters.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Browse by Category -->
+  <section class="section categories-section" id="by-type">
+    <div class="container">
+      <div class="section-header">
+        <h2>Browse by Partner Type</h2>
+        <p>Find partners by the type of relationship they have with Constellation</p>
+      </div>
+      <div class="type-grid">
+        {typeStats.map(({ type, count }) => (
+          <button class="type-tile" data-filter={type.toLowerCase()}>
+            <span class="type-name">{type}</span>
+            <span class="type-count">{count} partner{count !== 1 ? 's' : ''}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Become a Partner CTA -->
+  <section class="cta-strip">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Interested in Becoming a Partner?</h2>
+        <p>Join Constellation's network of trusted partners and grow together.</p>
+        <a href="https://goconstellation.com/contact" target="_blank" rel="noopener" class="btn btn-primary">
+          Get in Touch →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+const typeFilter = document.getElementById('typeFilter') as HTMLSelectElement;
+const industryFilter = document.getElementById('industryFilter') as HTMLSelectElement;
+const cards = document.querySelectorAll('#partnersGrid .partner-card') as NodeListOf<HTMLElement>;
+const resultCount = document.getElementById('resultCount');
+const noResults = document.getElementById('noResults');
+const typeTiles = document.querySelectorAll('.type-tile') as NodeListOf<HTMLButtonElement>;
+
+function filterCards() {
+  const search = searchInput.value.toLowerCase().trim();
+  const type = typeFilter.value.toLowerCase();
+  const industry = industryFilter.value.toLowerCase();
+  let visible = 0;
+
+  cards.forEach(card => {
+    const name = card.dataset.name || '';
+    const cardType = card.dataset.type || '';
+    const cardIndustry = card.dataset.industry || '';
+
+    const matchSearch = !search || name.includes(search);
+    const matchType = !type || cardType.includes(type);
+    const matchIndustry = !industry || cardIndustry.includes(industry);
+
+    const show = matchSearch && matchType && matchIndustry;
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  if (resultCount) resultCount.textContent = `${visible} partner${visible !== 1 ? 's' : ''}`;
+  if (noResults) noResults.style.display = visible === 0 ? 'block' : 'none';
+}
+
+searchInput?.addEventListener('input', filterCards);
+typeFilter?.addEventListener('change', filterCards);
+industryFilter?.addEventListener('change', filterCards);
+
+// Type tile quick-filter
+typeTiles.forEach(tile => {
+  tile.addEventListener('click', () => {
+    const filterVal = tile.dataset.filter || '';
+    typeFilter.value = filterVal;
+    filterCards();
+    document.getElementById('partnersGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+
+<style>
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--dark) 0%, #16213e 100%);
+  color: #fff;
+  padding: 80px 0 60px;
+}
+
+.hero-content { max-width: 700px; margin-bottom: 40px; }
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(79,188,133,0.2);
+  color: var(--green);
+  border: 1px solid rgba(79,188,133,0.4);
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  line-height: 1.1;
+}
+
+.hero-sub {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.7;
+}
+
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 20px 28px;
+  width: fit-content;
+}
+
+.stat { text-align: center; }
+.stat-number {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--green);
+}
+.stat-label { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
+.stat-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.15); }
+
+/* Sections */
+.section { padding: 72px 0; }
+
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-header h2 {
+  font-size: 2rem;
+  color: var(--gray-900);
+  margin-bottom: 8px;
+}
+
+.section-header p { color: var(--gray-500); font-size: 1rem; }
+
+/* Featured */
+.featured-section { background: var(--gray-100); }
+
+.featured-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+/* Filter bar */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 32px;
+  background: var(--gray-100);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 16px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+}
+.search-input:focus { border-color: var(--green); }
+
+.filter-select {
+  padding: 10px 14px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+}
+.filter-select:focus { border-color: var(--green); }
+
+.result-count {
+  font-size: 0.85rem;
+  color: var(--gray-500);
+  font-family: var(--font-heading);
+  white-space: nowrap;
+}
+
+/* Partners grid */
+.partners-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.no-results {
+  text-align: center;
+  padding: 48px;
+  color: var(--gray-500);
+  font-size: 1.05rem;
+}
+
+/* Categories */
+.categories-section { background: var(--gray-100); }
+
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.type-tile {
+  background: #fff;
+  border: 2px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 24px 20px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.type-tile:hover {
+  border-color: var(--green);
+  box-shadow: var(--shadow-green);
+  transform: translateY(-2px);
+}
+
+.type-name {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--gray-900);
+}
+
+.type-count {
+  font-size: 0.8rem;
+  color: var(--green);
+  font-family: var(--font-heading);
+}
+
+/* CTA Strip */
+.cta-strip {
+  background: linear-gradient(135deg, var(--dark) 0%, #16213e 100%);
+  padding: 60px 0;
+}
+
+.cta-content {
+  text-align: center;
+  color: #fff;
+}
+
+.cta-content h2 {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+.cta-content p {
+  color: rgba(255,255,255,0.7);
+  font-size: 1.05rem;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 768px) {
+  .hero h1 { font-size: 2.2rem; }
+  .hero-stats { flex-wrap: wrap; gap: 20px; }
+  .stat-divider { display: none; }
+  .filter-bar { flex-direction: column; }
+  .search-input { width: 100%; }
+}
+</style>

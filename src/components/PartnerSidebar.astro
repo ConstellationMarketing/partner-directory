@@ -1,0 +1,138 @@
+---
+interface Props {
+  website: string;
+  partnerName: string;
+  relatedPartners?: { name: string; slug: string; partnerType: string }[];
+}
+
+const { website, partnerName, relatedPartners = [] } = Astro.props;
+---
+
+<aside class="partner-sidebar">
+  <div class="sidebar-card cta-card">
+    <h3>Ready to Connect?</h3>
+    <p>Learn how partnering with Constellation can grow your business and deliver measurable results.</p>
+    <a href={website} target="_blank" rel="noopener" class="btn btn-primary">
+      Visit {partnerName} ↗
+    </a>
+    <a href="https://goconstellation.com/contact" target="_blank" rel="noopener" class="btn btn-outline" style="margin-top: 10px;">
+      Contact Constellation
+    </a>
+  </div>
+
+  <div class="sidebar-card share-card">
+    <h4>Share This Partner</h4>
+    <div class="share-buttons">
+      <button class="share-btn" id="copyLink">📋 Copy Link</button>
+      <a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://partners.goconstellation.com')}`} target="_blank" rel="noopener" class="share-btn">in LinkedIn</a>
+    </div>
+  </div>
+
+  {relatedPartners.length > 0 && (
+    <div class="sidebar-card related-card">
+      <h4>Related Partners</h4>
+      <ul class="related-list">
+        {relatedPartners.map(p => (
+          <li>
+            <a href={`/${p.slug}`}>
+              <span class="related-name">{p.name}</span>
+              <span class="related-type">{p.partnerType}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+</aside>
+
+<script>
+document.getElementById('copyLink')?.addEventListener('click', () => {
+  navigator.clipboard.writeText(window.location.href);
+  const btn = document.getElementById('copyLink');
+  if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => { btn.textContent = '📋 Copy Link'; }, 2000); }
+});
+</script>
+
+<style>
+.partner-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebar-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--gray-200);
+  padding: 24px;
+}
+
+.cta-card h3 {
+  font-size: 1.1rem;
+  color: var(--gray-900);
+  margin-bottom: 10px;
+}
+
+.cta-card p {
+  font-size: 0.88rem;
+  color: var(--gray-500);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.cta-card .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.share-card h4, .related-card h4 {
+  font-size: 0.95rem;
+  color: var(--gray-700);
+  margin-bottom: 14px;
+  font-family: var(--font-heading);
+}
+
+.share-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.share-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--gray-700);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+.share-btn:hover { border-color: var(--green); color: var(--green); }
+
+.related-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.related-list a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--gray-200);
+  transition: all 0.2s;
+}
+.related-list a:hover { border-color: var(--green); background: rgba(79,188,133,0.05); }
+
+.related-name { font-size: 0.88rem; font-weight: 600; color: var(--gray-900); }
+.related-type { font-size: 0.78rem; color: var(--green); font-family: var(--font-heading); }
+</style>

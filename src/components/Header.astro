@@ -1,0 +1,68 @@
+---
+const { currentPage = 'directory' } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="logo">
+      <span class="logo-constellation">Constellation</span>
+      <span class="logo-partners">Partners</span>
+    </a>
+    <nav>
+      <a href="/" class:list={['nav-link', { active: currentPage === 'directory' }]}>Directory</a>
+      <a href="/#by-type" class="nav-link">By Partner Type</a>
+      <a href="https://goconstellation.com" target="_blank" rel="noopener" class="nav-link">Main Site ↗</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+.site-header {
+  background: #fff;
+  border-bottom: 1px solid var(--gray-200);
+  padding: 16px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.site-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.logo-constellation { color: var(--gray-900); }
+.logo-partners { color: var(--green); }
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.nav-link {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--gray-700);
+  transition: color 0.2s;
+}
+
+.nav-link:hover, .nav-link.active { color: var(--green); }
+
+@media (max-width: 600px) {
+  nav { gap: 16px; }
+  .nav-link:nth-child(3) { display: none; }
+}
+</style>
