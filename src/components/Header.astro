@@ -11,6 +11,7 @@ const { currentPage = 'directory' } = Astro.props;
     <nav>
       <a href="/" class:list={['nav-link', { active: currentPage === 'directory' }]}>Directory</a>
       <a href="/#by-type" class="nav-link">By Partner Type</a>
+      <a href="/partner-with-us" class:list={['nav-link', { active: currentPage === 'partner-with-us' }]}>Partner With Us</a>
       <a href="https://goconstellation.com" target="_blank" rel="noopener" class="nav-link">Main Site ↗</a>
     </nav>
   </div>
