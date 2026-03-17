@@ -1,5 +1,6 @@
 ---
 name: "International Legal Technology Association"
+logo: "/logos/ilt.png"
 website: "https://www.iltanet.org"
 industry: ["Legal Technology", "Legal Services"]
 partnerType: "Technology Partner"

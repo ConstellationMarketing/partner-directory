@@ -1,5 +1,6 @@
 ---
 name: "Lawyer Stories"
+logo: "/logos/lawyer-stories.png"
 website: "https://thelawyerstories.com"
 industry: ["Legal Services", "Legal Technology"]
 partnerType: "Media Partner"

@@ -1,5 +1,6 @@
 ---
 name: "Missouri Organization of Defense Lawyers (MODL)"
+logo: "/logos/modl.png"
 website: "https://modllaw.com"
 industry: ["Legal Services", "Legal Education"]
 partnerType: "Association Partner"

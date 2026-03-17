@@ -1,5 +1,6 @@
 ---
 name: "Story First"
+logo: "/logos/story-first.svg"
 website: "https://thestoryfirst.com"
 industry: ["Legal Marketing", "Video Production"]
 partnerType: "Creative Partner"

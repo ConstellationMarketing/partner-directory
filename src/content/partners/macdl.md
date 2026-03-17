@@ -1,5 +1,6 @@
 ---
 name: "Missouri Association of Criminal Defense Lawyers (MACDL)"
+logo: "/logos/macdl.png"
 website: "https://www.macdl.net"
 industry: ["Legal Services", "Criminal Defense", "Legal Education"]
 partnerType: "Association Partner"
