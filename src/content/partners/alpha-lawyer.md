@@ -6,7 +6,7 @@ partnerType: "Referral Partner"
 location: "United States"
 shortDescription: "Alpha Lawyer connects attorneys with marketing solutions that drive real client growth. Constellation's referral partnership ensures attorneys get premium digital marketing services."
 featured: false
-status: "active"
+status: "inactive"
 tags: ["Attorney Marketing", "Law Firms", "Referral", "Digital Marketing", "SEO"]
 layout: "standard"
 faqs:
