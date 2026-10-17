@@ -1,444 +1,52 @@
 ---
+// Production layout recovered from immutable deployment bb877ed5. Partner
+// records remain Markdown-driven; new records join their partner-type group.
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import PartnerCard from '../components/PartnerCard.astro';
-
-const allPartners = await getCollection('partners');
-const activePartners = allPartners.filter(p => p.data.status === 'active');
-const featuredPartners = activePartners.filter(p => p.data.featured);
-const regularPartners = activePartners.filter(p => !p.data.featured);
-
-const totalPartners = activePartners.length;
-const allTypes = [...new Set(activePartners.map(p => p.data.partnerType))];
-const allIndustries = [...new Set(activePartners.flatMap(p => p.data.industry))];
-
-// Partner type tiles for Browse by Category
-const typeStats = allTypes.map(type => ({
-  type,
-  count: activePartners.filter(p => p.data.partnerType === type).length,
-}));
+const activePartners = (await getCollection('partners')).filter(p => p.data.status === 'active');
+const categories = [
+  {
+    "key": "category-0",
+    "types": [
+      "creative partner"
+    ],
+    "order": [
+      "story-first"
+    ]
+  },
+  {
+    "key": "category-1",
+    "types": [
+      "association partner",
+      "media partner"
+    ],
+    "order": [
+      "ilt",
+      "lawyer-stories",
+      "macdl",
+      "modl"
+    ]
+  }
+];
+const categoryPartners = Object.fromEntries(categories.map(group => [group.key,
+  activePartners.filter(p => group.types.includes(p.data.partnerType.toLowerCase())).sort((a, b) => {
+    const rank = (id: string) => { const index = group.order.indexOf(id); return index < 0 ? 1000 : index; };
+    return rank(a.id) - rank(b.id) || a.data.name.localeCompare(b.data.name);
+  })]));
 ---
 
-<BaseLayout
-  title="Partner Directory | Constellation Marketing"
-  description="Explore Constellation Marketing's trusted network of partners — technology providers, referral partners, and strategic allies driving results for law firms."
->
-  <Header />
-
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-content">
-        <div class="hero-badge">Constellation Partner Network</div>
-        <h1>Our Trusted Partners</h1>
-        <p class="hero-sub">A curated network of technology providers, referral partners, and strategic allies that help Constellation deliver exceptional results for law firms and professional services companies.</p>
-      </div>
-      <div class="hero-stats">
-        <div class="stat">
-          <span class="stat-number">{totalPartners}</span>
-          <span class="stat-label">Total Partners</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat">
-          <span class="stat-number">{activePartners.length}</span>
-          <span class="stat-label">Active</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat">
-          <span class="stat-number">{featuredPartners.length}</span>
-          <span class="stat-label">Featured</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Featured Partners -->
-  {featuredPartners.length > 0 && (
-    <section class="section featured-section">
-      <div class="container">
-        <div class="section-header">
-          <h2>Featured Partners</h2>
-          <p>Cornerstone relationships that define our partner network</p>
-        </div>
-        <div class="featured-grid">
-          {featuredPartners.map(partner => (
-            <PartnerCard
-              slug={partner.id}
-              name={partner.data.name}
-              shortDescription={partner.data.shortDescription}
-              partnerType={partner.data.partnerType}
-              industry={partner.data.industry}
-              location={partner.data.location}
-              featured={partner.data.featured}
-              status={partner.data.status}
-              logo={partner.data.logo}
-              tags={partner.data.tags}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
-  )}
-
-  <!-- Directory with Search & Filter -->
-  <section class="section directory-section">
-    <div class="container">
-      <div class="section-header">
-        <h2>All Partners</h2>
-        <p>Search and filter to find the right partner</p>
-      </div>
-
-      <!-- Filter Controls -->
-      <div class="filter-bar">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Search partners..."
-          class="search-input"
-          autocomplete="off"
-        />
-        <select id="typeFilter" class="filter-select">
-          <option value="">All Partner Types</option>
-          {allTypes.map(type => <option value={type.toLowerCase()}>{type}</option>)}
-        </select>
-        <select id="industryFilter" class="filter-select">
-          <option value="">All Industries</option>
-          {allIndustries.map(ind => <option value={ind.toLowerCase()}>{ind}</option>)}
-        </select>
-        <span id="resultCount" class="result-count">{activePartners.length} partners</span>
-      </div>
-
-      <!-- Partner Grid -->
-      <div class="partners-grid" id="partnersGrid">
-        {featuredPartners.map(partner => (
-          <PartnerCard
-            slug={partner.id}
-            name={partner.data.name}
-            shortDescription={partner.data.shortDescription}
-            partnerType={partner.data.partnerType}
-            industry={partner.data.industry}
-            location={partner.data.location}
-            featured={partner.data.featured}
-            status={partner.data.status}
-            logo={partner.data.logo}
-            tags={partner.data.tags}
-          />
-        ))}
-        {regularPartners.map(partner => (
-          <PartnerCard
-            slug={partner.id}
-            name={partner.data.name}
-            shortDescription={partner.data.shortDescription}
-            partnerType={partner.data.partnerType}
-            industry={partner.data.industry}
-            location={partner.data.location}
-            featured={partner.data.featured}
-            status={partner.data.status}
-            logo={partner.data.logo}
-            tags={partner.data.tags}
-          />
-        ))}
-      </div>
-
-      <div id="noResults" class="no-results" style="display:none;">
-        <p>No partners found matching your search. Try adjusting your filters.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Browse by Category -->
-  <section class="section categories-section" id="by-type">
-    <div class="container">
-      <div class="section-header">
-        <h2>Browse by Partner Type</h2>
-        <p>Find partners by the type of relationship they have with Constellation</p>
-      </div>
-      <div class="type-grid">
-        {typeStats.map(({ type, count }) => (
-          <button class="type-tile" data-filter={type.toLowerCase()}>
-            <span class="type-name">{type}</span>
-            <span class="type-count">{count} partner{count !== 1 ? 's' : ''}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Become a Partner CTA -->
-  <section class="cta-strip">
-    <div class="container">
-      <div class="cta-content">
-        <h2>Interested in Becoming a Partner?</h2>
-        <p>Join Constellation's network of trusted partners and grow together.</p>
-        <a href="https://goconstellation.com/contact" target="_blank" rel="noopener" class="btn btn-primary">
-          Get in Touch →
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <Footer />
+<BaseLayout title={"Partner Directory | Constellation Marketing"} description={"Explore Constellation Marketing's trusted network of partners — built for law firms investing in serious growth."}>
+  <Header />  <section class="hero" data-astro-cid-j7pv25f6=""> <!-- Floating logo background texture --> <div class="hero-bg-logos" aria-hidden="true" data-astro-cid-j7pv25f6=""> <img src="/logos/ilt.png" alt="" class="bg-logo" style="--delay: 0s; --x: 10%; --y: 5%;" data-astro-cid-j7pv25f6=""><img src="/logos/lawyer-stories.png" alt="" class="bg-logo" style="--delay: 0.7s; --x: 27%; --y: 28%;" data-astro-cid-j7pv25f6=""><img src="/logos/macdl.png" alt="" class="bg-logo" style="--delay: 1.4s; --x: 44%; --y: 51%;" data-astro-cid-j7pv25f6=""><img src="/logos/modl.png" alt="" class="bg-logo" style="--delay: 2.0999999999999996s; --x: 61%; --y: 74%;" data-astro-cid-j7pv25f6=""><img src="/logos/story-first.svg" alt="" class="bg-logo" style="--delay: 2.8s; --x: 78%; --y: 17%;" data-astro-cid-j7pv25f6=""> </div> <div class="container hero-inner" data-astro-cid-j7pv25f6=""> <div class="hero-text" data-astro-cid-j7pv25f6=""> <div class="hero-badge" data-astro-cid-j7pv25f6="">Curated by Constellation</div> <h1 data-astro-cid-j7pv25f6="">The right partners for every<br data-astro-cid-j7pv25f6="">stage of your firm's growth.</h1> <p class="hero-sub" data-astro-cid-j7pv25f6="">Constellation's vetted network — built for law firms investing in serious growth.</p> </div> <div class="category-cards" data-astro-cid-j7pv25f6=""> <a href="#build-your-brand" class="category-card" style="animation-delay: 0.1s" data-astro-cid-j7pv25f6=""> <div class="card-top-accent" data-astro-cid-j7pv25f6=""></div> <div class="card-emoji" data-astro-cid-j7pv25f6="">🎬</div> <h3 class="card-title" data-astro-cid-j7pv25f6="">Build Your Brand</h3> <p class="card-desc" data-astro-cid-j7pv25f6="">Video, storytelling, and positioning that makes your firm impossible to ignore.</p> <div class="card-footer" data-astro-cid-j7pv25f6=""> <span class="card-count" data-astro-cid-j7pv25f6="">1 partner</span> <span class="card-arrow" data-astro-cid-j7pv25f6="">→</span> </div> </a><a href="#education-community" class="category-card" style="animation-delay: 0.2s" data-astro-cid-j7pv25f6=""> <div class="card-top-accent" data-astro-cid-j7pv25f6=""></div> <div class="card-emoji" data-astro-cid-j7pv25f6="">📚</div> <h3 class="card-title" data-astro-cid-j7pv25f6="">Education &amp; Community</h3> <p class="card-desc" data-astro-cid-j7pv25f6="">CLE, bar associations, and peer networks for attorneys investing in their craft.</p> <div class="card-footer" data-astro-cid-j7pv25f6=""> <span class="card-count" data-astro-cid-j7pv25f6="">4 partners</span> <span class="card-arrow" data-astro-cid-j7pv25f6="">→</span> </div> </a><a href="#legal-technology" class="category-card" style="animation-delay: 0.30000000000000004s" data-astro-cid-j7pv25f6=""> <div class="card-top-accent" data-astro-cid-j7pv25f6=""></div> <div class="card-emoji" data-astro-cid-j7pv25f6="">⚖️</div> <h3 class="card-title" data-astro-cid-j7pv25f6="">Legal Technology</h3> <p class="card-desc" data-astro-cid-j7pv25f6="">Tools and platforms purpose-built for the modern law firm.</p> <div class="card-footer" data-astro-cid-j7pv25f6=""> <span class="card-count" data-astro-cid-j7pv25f6="">0 partners</span> <span class="card-arrow" data-astro-cid-j7pv25f6="">→</span> </div> </a> </div> </div> </section>  <section class="filter-section" data-astro-cid-j7pv25f6=""> <div class="container" data-astro-cid-j7pv25f6=""> <div class="filter-bar" data-astro-cid-j7pv25f6=""> <input type="text" id="searchInput" placeholder="Search partners..." class="search-input" autocomplete="off" data-astro-cid-j7pv25f6=""> <select id="typeFilter" class="filter-select" data-astro-cid-j7pv25f6=""> <option value="" data-astro-cid-j7pv25f6="">All Partner Types</option> <option value="association partner" data-astro-cid-j7pv25f6="">Association Partner</option><option value="media partner" data-astro-cid-j7pv25f6="">Media Partner</option><option value="creative partner" data-astro-cid-j7pv25f6="">Creative Partner</option> </select> <select id="industryFilter" class="filter-select" data-astro-cid-j7pv25f6=""> <option value="" data-astro-cid-j7pv25f6="">All Industries</option> <option value="legal services" data-astro-cid-j7pv25f6="">Legal Services</option><option value="legal education" data-astro-cid-j7pv25f6="">Legal Education</option><option value="immigration law" data-astro-cid-j7pv25f6="">Immigration Law</option><option value="legal technology" data-astro-cid-j7pv25f6="">Legal Technology</option><option value="criminal defense" data-astro-cid-j7pv25f6="">Criminal Defense</option><option value="legal marketing" data-astro-cid-j7pv25f6="">Legal Marketing</option><option value="video production" data-astro-cid-j7pv25f6="">Video Production</option> </select> <select id="categoryFilter" class="filter-select" data-astro-cid-j7pv25f6=""> <option value="" data-astro-cid-j7pv25f6="">All Categories</option> <option value="build-your-brand" data-astro-cid-j7pv25f6="">Build Your Brand</option><option value="education-community" data-astro-cid-j7pv25f6="">Education &amp; Community</option><option value="legal-technology" data-astro-cid-j7pv25f6="">Legal Technology</option> </select> <span id="resultCount" class="result-count" data-astro-cid-j7pv25f6="">5 partners</span> </div> </div> </section>  <section class="category-section section" id="build-your-brand" data-category="build-your-brand" data-astro-cid-j7pv25f6=""> <div class="container" data-astro-cid-j7pv25f6=""> <div class="category-section-header" data-astro-cid-j7pv25f6=""> <div class="category-label" data-astro-cid-j7pv25f6=""> <span class="cat-emoji" data-astro-cid-j7pv25f6="">🎬</span> <h2 data-astro-cid-j7pv25f6="">Build Your Brand</h2> </div> <p class="category-intro" data-astro-cid-j7pv25f6="">Video, storytelling, and positioning that makes your firm impossible to ignore.</p> </div> <div class="partners-grid" id="grid-build-your-brand" data-astro-cid-j7pv25f6="">{categoryPartners["category-0"].map(partner => <PartnerCard slug={partner.id} {...partner.data} />)}</div>  </div> </section><section class="category-section section" id="education-community" data-category="education-community" data-astro-cid-j7pv25f6=""> <div class="container" data-astro-cid-j7pv25f6=""> <div class="category-section-header" data-astro-cid-j7pv25f6=""> <div class="category-label" data-astro-cid-j7pv25f6=""> <span class="cat-emoji" data-astro-cid-j7pv25f6="">📚</span> <h2 data-astro-cid-j7pv25f6="">Education &amp; Community</h2> </div> <p class="category-intro" data-astro-cid-j7pv25f6="">CLE, bar associations, and peer networks for attorneys investing in their craft.</p> </div> <div class="partners-grid" id="grid-education-community" data-astro-cid-j7pv25f6="">{categoryPartners["category-1"].map(partner => <PartnerCard slug={partner.id} {...partner.data} />)}</div>  </div> </section><section class="category-section section" id="legal-technology" data-category="legal-technology" data-astro-cid-j7pv25f6=""> <div class="container" data-astro-cid-j7pv25f6=""> <div class="category-section-header" data-astro-cid-j7pv25f6=""> <div class="category-label" data-astro-cid-j7pv25f6=""> <span class="cat-emoji" data-astro-cid-j7pv25f6="">⚖️</span> <h2 data-astro-cid-j7pv25f6="">Legal Technology</h2> </div> <p class="category-intro" data-astro-cid-j7pv25f6="">Tools and platforms purpose-built for the modern law firm.</p> </div> <div class="partners-grid" id="grid-legal-technology" data-astro-cid-j7pv25f6="">  </div> <p class="empty-category" data-astro-cid-j7pv25f6="">No partners in this category yet.</p> </div> </section> <div id="noResults" class="no-results" style="display:none;" data-astro-cid-j7pv25f6=""> <div class="container" data-astro-cid-j7pv25f6=""> <p data-astro-cid-j7pv25f6="">No partners found matching your search. Try adjusting your filters.</p> </div> </div>  <section class="cta-strip" data-astro-cid-j7pv25f6=""> <div class="container" data-astro-cid-j7pv25f6=""> <div class="cta-content" data-astro-cid-j7pv25f6=""> <h2 data-astro-cid-j7pv25f6="">Interested in Becoming a Partner?</h2> <p data-astro-cid-j7pv25f6="">Join Constellation's network of trusted partners and grow together.</p> <a href="https://goconstellation.com/contact" target="_blank" rel="noopener" class="btn btn-primary" data-astro-cid-j7pv25f6="">
+Get in Touch →
+</a> </div> </div> </section> <Footer />
 </BaseLayout>
 
-<script>
-const searchInput = document.getElementById('searchInput') as HTMLInputElement;
-const typeFilter = document.getElementById('typeFilter') as HTMLSelectElement;
-const industryFilter = document.getElementById('industryFilter') as HTMLSelectElement;
-const cards = document.querySelectorAll('#partnersGrid .partner-card') as NodeListOf<HTMLElement>;
-const resultCount = document.getElementById('resultCount');
-const noResults = document.getElementById('noResults');
-const typeTiles = document.querySelectorAll('.type-tile') as NodeListOf<HTMLButtonElement>;
+<script is:inline type="module">const m=document.getElementById("searchInput"),g=document.getElementById("typeFilter"),p=document.getElementById("industryFilter"),h=document.getElementById("categoryFilter"),y=document.getElementById("resultCount"),u=document.getElementById("noResults"),f=document.querySelectorAll(".partner-card"),L=document.querySelectorAll(".category-section");function o(){const a=m.value.toLowerCase().trim(),r=g.value.toLowerCase(),l=p.value.toLowerCase(),e=h.value;let n=0;L.forEach(t=>{const s=t.dataset.category||"",c=!e||s===e||s==="other";t.style.display=c?"":"none"}),f.forEach(t=>{const s=t.dataset.name||"",c=t.dataset.type||"",E=t.dataset.industry||"",d=t.closest(".category-section")?.dataset.category||"";if(e&&d!==e&&d!=="other"){t.style.display="none";return}const C=!a||s.includes(a),I=!r||c.includes(r),v=!l||E.includes(l),i=C&&I&&v;t.style.display=i?"":"none",i&&n++}),y&&(y.textContent=`${n} partner${n!==1?"s":""}`),u&&(u.style.display=n===0?"block":"none")}m?.addEventListener("input",o);g?.addEventListener("change",o);p?.addEventListener("change",o);h?.addEventListener("change",o);</script>
 
-function filterCards() {
-  const search = searchInput.value.toLowerCase().trim();
-  const type = typeFilter.value.toLowerCase();
-  const industry = industryFilter.value.toLowerCase();
-  let visible = 0;
+<style is:global>
+.hero[data-astro-cid-j7pv25f6]{position:relative;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;padding:80px 0 72px;overflow:hidden}.hero-bg-logos[data-astro-cid-j7pv25f6]{position:absolute;inset:0;pointer-events:none;z-index:0}.bg-logo[data-astro-cid-j7pv25f6]{position:absolute;left:var(--x);top:var(--y);width:64px;height:64px;object-fit:contain;opacity:.07;filter:grayscale(1) invert(1);animation:float var(--delay, 0s) ease-in-out infinite alternate}.hero-inner[data-astro-cid-j7pv25f6]{position:relative;z-index:1}.hero-text[data-astro-cid-j7pv25f6]{max-width:680px;margin-bottom:52px;animation:fadeUp .6s ease both}.hero-badge[data-astro-cid-j7pv25f6]{display:inline-block;background:#4fbc8533;color:var(--green);border:1px solid rgba(79,188,133,.4);padding:6px 16px;border-radius:50px;font-size:.8rem;font-family:var(--font-heading);font-weight:600;letter-spacing:.5px;margin-bottom:20px}.hero[data-astro-cid-j7pv25f6] h1[data-astro-cid-j7pv25f6]{font-size:3rem;font-weight:700;margin-bottom:16px;line-height:1.15}.hero-sub[data-astro-cid-j7pv25f6]{font-size:1.05rem;color:#ffffffb8;line-height:1.7}.category-cards[data-astro-cid-j7pv25f6]{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.category-card[data-astro-cid-j7pv25f6]{display:block;text-decoration:none;color:inherit;background:#ffffff0f;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:28px 24px 24px;position:relative;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;animation:fadeUp .6s ease both}.category-card[data-astro-cid-j7pv25f6]:hover{transform:translateY(-4px);box-shadow:0 8px 32px #4fbc8533;border-color:#4fbc8566}.card-top-accent[data-astro-cid-j7pv25f6]{position:absolute;top:0;left:0;right:0;height:3px;background:var(--green);border-radius:16px 16px 0 0}.card-emoji[data-astro-cid-j7pv25f6]{font-size:1.8rem;margin-bottom:12px;display:block}.card-title[data-astro-cid-j7pv25f6]{font-size:1.1rem;font-weight:700;font-family:var(--font-heading);color:#fff;margin-bottom:8px}.card-desc[data-astro-cid-j7pv25f6]{font-size:.88rem;color:#ffffffa6;line-height:1.6;margin-bottom:20px}.card-footer[data-astro-cid-j7pv25f6]{display:flex;align-items:center;justify-content:space-between}.card-count[data-astro-cid-j7pv25f6]{display:inline-block;background:#4fbc8533;color:var(--green);border:1px solid rgba(79,188,133,.35);padding:3px 10px;border-radius:50px;font-size:.78rem;font-family:var(--font-heading);font-weight:600}.card-arrow[data-astro-cid-j7pv25f6]{color:#fff6;font-size:1.1rem;transition:transform .2s ease,color .2s ease}.category-card[data-astro-cid-j7pv25f6]:hover .card-arrow[data-astro-cid-j7pv25f6]{transform:translate(4px);color:var(--green)}.filter-section[data-astro-cid-j7pv25f6]{background:var(--gray-100);padding:20px 0;border-bottom:1px solid var(--gray-200);position:sticky;top:0;z-index:10}.filter-bar[data-astro-cid-j7pv25f6]{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.search-input[data-astro-cid-j7pv25f6]{flex:1;min-width:200px;padding:10px 16px;border:1px solid var(--gray-200);border-radius:8px;font-family:var(--font-body);font-size:.9rem;outline:none;background:#fff}.search-input[data-astro-cid-j7pv25f6]:focus{border-color:var(--green)}.filter-select[data-astro-cid-j7pv25f6]{padding:10px 14px;border:1px solid var(--gray-200);border-radius:8px;font-family:var(--font-body);font-size:.9rem;background:#fff;cursor:pointer;outline:none}.filter-select[data-astro-cid-j7pv25f6]:focus{border-color:var(--green)}.result-count[data-astro-cid-j7pv25f6]{font-size:.85rem;color:var(--gray-500);font-family:var(--font-heading);white-space:nowrap}.section[data-astro-cid-j7pv25f6]{padding:72px 0}.category-section[data-astro-cid-j7pv25f6]:nth-child(2n){background:var(--gray-100)}.category-section-header[data-astro-cid-j7pv25f6]{margin-bottom:36px}.category-label[data-astro-cid-j7pv25f6]{display:flex;align-items:center;gap:12px;margin-bottom:8px}.cat-emoji[data-astro-cid-j7pv25f6]{font-size:1.6rem}.category-section-header[data-astro-cid-j7pv25f6] h2[data-astro-cid-j7pv25f6]{font-size:1.75rem;color:var(--gray-900);margin:0}.category-intro[data-astro-cid-j7pv25f6]{color:var(--gray-500);font-size:1rem;margin:0;padding-left:48px}.partners-grid[data-astro-cid-j7pv25f6]{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px}.empty-category[data-astro-cid-j7pv25f6]{color:var(--gray-400);font-style:italic}.no-results[data-astro-cid-j7pv25f6]{text-align:center;padding:48px;color:var(--gray-500);font-size:1.05rem}.cta-strip[data-astro-cid-j7pv25f6]{background:linear-gradient(135deg,#1a1a2e,#16213e);padding:60px 0}.cta-content[data-astro-cid-j7pv25f6]{text-align:center;color:#fff}.cta-content[data-astro-cid-j7pv25f6] h2[data-astro-cid-j7pv25f6]{font-size:2rem;margin-bottom:12px}.cta-content[data-astro-cid-j7pv25f6] p[data-astro-cid-j7pv25f6]{color:#ffffffb3;font-size:1.05rem;margin-bottom:28px}@media(max-width:900px){.category-cards[data-astro-cid-j7pv25f6]{grid-template-columns:1fr 1fr}}@media(max-width:768px){.hero[data-astro-cid-j7pv25f6] h1[data-astro-cid-j7pv25f6]{font-size:2.2rem}.category-cards[data-astro-cid-j7pv25f6]{grid-template-columns:1fr;gap:14px}.filter-bar[data-astro-cid-j7pv25f6]{flex-direction:column;align-items:stretch}.search-input[data-astro-cid-j7pv25f6]{width:100%}.category-intro[data-astro-cid-j7pv25f6]{padding-left:0}}
 
-  cards.forEach(card => {
-    const name = card.dataset.name || '';
-    const cardType = card.dataset.type || '';
-    const cardIndustry = card.dataset.industry || '';
-
-    const matchSearch = !search || name.includes(search);
-    const matchType = !type || cardType.includes(type);
-    const matchIndustry = !industry || cardIndustry.includes(industry);
-
-    const show = matchSearch && matchType && matchIndustry;
-    card.style.display = show ? '' : 'none';
-    if (show) visible++;
-  });
-
-  if (resultCount) resultCount.textContent = `${visible} partner${visible !== 1 ? 's' : ''}`;
-  if (noResults) noResults.style.display = visible === 0 ? 'block' : 'none';
-}
-
-searchInput?.addEventListener('input', filterCards);
-typeFilter?.addEventListener('change', filterCards);
-industryFilter?.addEventListener('change', filterCards);
-
-// Type tile quick-filter
-typeTiles.forEach(tile => {
-  tile.addEventListener('click', () => {
-    const filterVal = tile.dataset.filter || '';
-    typeFilter.value = filterVal;
-    filterCards();
-    document.getElementById('partnersGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-});
-</script>
-
-<style>
-/* Hero */
-.hero {
-  background: linear-gradient(135deg, var(--dark) 0%, #16213e 100%);
-  color: #fff;
-  padding: 80px 0 60px;
-}
-
-.hero-content { max-width: 700px; margin-bottom: 40px; }
-
-.hero-badge {
-  display: inline-block;
-  background: rgba(79,188,133,0.2);
-  color: var(--green);
-  border: 1px solid rgba(79,188,133,0.4);
-  padding: 6px 16px;
-  border-radius: 50px;
-  font-size: 0.8rem;
-  font-family: var(--font-heading);
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  margin-bottom: 20px;
-}
-
-.hero h1 {
-  font-size: 3rem;
-  font-weight: 700;
-  margin-bottom: 16px;
-  line-height: 1.1;
-}
-
-.hero-sub {
-  font-size: 1.05rem;
-  color: rgba(255,255,255,0.75);
-  line-height: 1.7;
-}
-
-.hero-stats {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  padding: 20px 28px;
-  width: fit-content;
-}
-
-.stat { text-align: center; }
-.stat-number {
-  display: block;
-  font-family: var(--font-heading);
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--green);
-}
-.stat-label { font-size: 0.85rem; color: rgba(255,255,255,0.6); }
-.stat-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.15); }
-
-/* Sections */
-.section { padding: 72px 0; }
-
-.section-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.section-header h2 {
-  font-size: 2rem;
-  color: var(--gray-900);
-  margin-bottom: 8px;
-}
-
-.section-header p { color: var(--gray-500); font-size: 1rem; }
-
-/* Featured */
-.featured-section { background: var(--gray-100); }
-
-.featured-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
-}
-
-/* Filter bar */
-.filter-bar {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 32px;
-  background: var(--gray-100);
-  padding: 16px;
-  border-radius: 12px;
-}
-
-.search-input {
-  flex: 1;
-  min-width: 200px;
-  padding: 10px 16px;
-  border: 1px solid var(--gray-200);
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  outline: none;
-}
-.search-input:focus { border-color: var(--green); }
-
-.filter-select {
-  padding: 10px 14px;
-  border: 1px solid var(--gray-200);
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  background: #fff;
-  cursor: pointer;
-  outline: none;
-}
-.filter-select:focus { border-color: var(--green); }
-
-.result-count {
-  font-size: 0.85rem;
-  color: var(--gray-500);
-  font-family: var(--font-heading);
-  white-space: nowrap;
-}
-
-/* Partners grid */
-.partners-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 24px;
-}
-
-.no-results {
-  text-align: center;
-  padding: 48px;
-  color: var(--gray-500);
-  font-size: 1.05rem;
-}
-
-/* Categories */
-.categories-section { background: var(--gray-100); }
-
-.type-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-}
-
-.type-tile {
-  background: #fff;
-  border: 2px solid var(--gray-200);
-  border-radius: 12px;
-  padding: 24px 20px;
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.2s;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.type-tile:hover {
-  border-color: var(--green);
-  box-shadow: var(--shadow-green);
-  transform: translateY(-2px);
-}
-
-.type-name {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--gray-900);
-}
-
-.type-count {
-  font-size: 0.8rem;
-  color: var(--green);
-  font-family: var(--font-heading);
-}
-
-/* CTA Strip */
-.cta-strip {
-  background: linear-gradient(135deg, var(--dark) 0%, #16213e 100%);
-  padding: 60px 0;
-}
-
-.cta-content {
-  text-align: center;
-  color: #fff;
-}
-
-.cta-content h2 {
-  font-size: 2rem;
-  margin-bottom: 12px;
-}
-
-.cta-content p {
-  color: rgba(255,255,255,0.7);
-  font-size: 1.05rem;
-  margin-bottom: 28px;
-}
-
-@media (max-width: 768px) {
-  .hero h1 { font-size: 2.2rem; }
-  .hero-stats { flex-wrap: wrap; gap: 20px; }
-  .stat-divider { display: none; }
-  .filter-bar { flex-direction: column; }
-  .search-input { width: 100%; }
-}
 </style>
