@@ -1,28 +1,20 @@
 ---
-name: "International Legal Technology Association"
+name: "Immigration Lawyers Toolbox"
 logo: "/logos/ilt.png"
-website: "https://www.iltanet.org"
-industry: ["Legal Technology", "Legal Services"]
-partnerType: "Technology Partner"
-location: "Chicago, IL"
-shortDescription: "ILTA is the premier professional association for legal technology professionals, connecting Constellation with cutting-edge law firms and legal tech innovators."
+website: "https://immigrationlawyerstoolbox.com"
+industry: ["Legal Services","Legal Education","Immigration Law"]
+partnerType: "Association Partner"
+location: ""
+shortDescription: "Immigration Lawyers Toolbox is an educational and community network helping immigration attorneys build profitable practices through courses, live coaching, and peer mentorship."
 featured: true
 status: "active"
-tags: ["Legal Technology", "Law Firms", "Networking", "Education", "Enterprise"]
+tags: ["Immigration Law","CLE","Community","Coaching","Law Firm Growth"]
 layout: "featured"
-faqs:
-  - question: "How does the ILTA partnership benefit law firm clients?"
-    answer: "Through ILTA, Constellation stays at the forefront of legal technology trends, ensuring our marketing strategies leverage the latest tools and platforms that law firms are adopting."
-  - question: "What services does Constellation provide to ILTA members?"
-    answer: "Constellation offers specialized digital marketing services tailored for legal technology companies and law firms, including SEO, PPC, and content marketing focused on the legal sector."
+faqs: [{"question":"What does Immigration Lawyers Toolbox offer its members?","answer":"Online courses covering immigration law fundamentals, a members-only community, quarterly live coaching sessions, an unlimited Q&A portal, and business fundamentals training for running a profitable immigration practice."},{"question":"How does the ILT partnership benefit Constellation clients?","answer":"Immigration attorneys in the ILT community are actively investing in their practices — making them a natural audience for Constellation's marketing services. Our partnership surfaces our expertise to attorneys who are already committed to growth."}]
 ---
 
-The International Legal Technology Association (ILTA) is the world's premier professional community for legal technology professionals. As a partner, Constellation gains direct access to the pulse of legal technology innovation and connects with law firm decision-makers across North America and beyond.
-
-## About This Partnership
-
-Our partnership with ILTA enables Constellation to serve legal technology companies and law firms with marketing strategies rooted in deep industry knowledge. We attend annual ILTA conferences, participate in educational programming, and maintain active membership in the community.
-
-## How We Work Together
-
-Constellation and ILTA collaborate on thought leadership content, event sponsorships, and educational resources for legal marketing professionals. This partnership gives our clients in the legal vertical an edge — we understand the technology landscape they operate in.
+<p>Immigration Lawyers Toolbox® (ILT) is an educational platform and support network built specifically for immigration law practitioners. Founded by immigration attorney John Khosravi, ILT fills the gap between law school and real-world practice — teaching lawyers the business and technical skills they need to build a profitable immigration firm.</p>
+<h2 id="about-this-partnership">About This Partnership</h2>
+<p>Constellation’s partnership with ILT connects us to a community of immigration attorneys who are actively investing in their professional development and practice growth. These are exactly the kind of law firm owners who benefit from serious digital marketing — and Constellation’s track record in legal SEO and paid advertising makes us a natural fit for the ILT community.</p>
+<h2 id="what-immigration-lawyers-toolbox-offers">What Immigration Lawyers Toolbox Offers</h2>
+<p>ILT provides online courses covering immigration law fundamentals, a members-only community network, quarterly live coaching sessions, and an unlimited Q&amp;A portal for real-time case support. The platform also delivers business fundamentals training — teaching attorneys how to run and scale a practice, not just handle cases.</p>

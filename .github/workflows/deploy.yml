@@ -1,0 +1,24 @@
+name: Deploy protected partner directory
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: protected-partner-directory
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_PROTECTED_PAGES_TOKEN }}
+          accountId: 9785359576871e50c68d671bf873797f
+          command: pages deploy dist --project-name partner-directory --branch main

@@ -2,68 +2,9 @@
 const { currentPage = 'directory' } = Astro.props;
 ---
 
-<header class="site-header">
-  <div class="container">
-    <a href="/" class="logo">
-      <span class="logo-constellation">Constellation</span>
-      <span class="logo-partners">Partners</span>
-    </a>
-    <nav>
-      <a href="/" class:list={['nav-link', { active: currentPage === 'directory' }]}>Directory</a>
-      <a href="/#by-type" class="nav-link">By Partner Type</a>
-      <a href="/partner-with-us" class:list={['nav-link', { active: currentPage === 'partner-with-us' }]}>Partner With Us</a>
-      <a href="https://goconstellation.com" target="_blank" rel="noopener" class="nav-link">Main Site ↗</a>
-    </nav>
-  </div>
-</header>
+<header class="site-header" data-astro-cid-3ef6ksr2=""> <div class="container" data-astro-cid-3ef6ksr2=""> <a href="/" class="logo" data-astro-cid-3ef6ksr2=""> <img src="/constellation-logo.png" alt="Constellation" class="logo-img" data-astro-cid-3ef6ksr2=""> </a> <nav data-astro-cid-3ef6ksr2=""> <span class="nav-label" data-astro-cid-3ef6ksr2="">Partners</span> <a href="/" class:list={['nav-link', { active: currentPage === 'directory' }]} data-astro-cid-3ef6ksr2="">Directory</a> <a href="/#by-type" class="nav-link" data-astro-cid-3ef6ksr2="">By Partner Type</a> <a href="/partner-with-us" class:list={['nav-link', { active: currentPage === 'partner-with-us' }]} data-astro-cid-3ef6ksr2="">Partner With Us</a> <a href="https://goconstellation.com" target="_blank" rel="noopener" class="nav-link" data-astro-cid-3ef6ksr2="">Main Site ↗</a> </nav> </div> </header>
 
-<style>
-.site-header {
-  background: #fff;
-  border-bottom: 1px solid var(--gray-200);
-  padding: 16px 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
+<style is:global>
+.site-header[data-astro-cid-3ef6ksr2]{background:#fff;border-bottom:1px solid var(--gray-200);padding:16px 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px #0000000f}.site-header[data-astro-cid-3ef6ksr2] .container[data-astro-cid-3ef6ksr2]{display:flex;align-items:center;justify-content:space-between}.logo[data-astro-cid-3ef6ksr2]{display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-weight:700;font-size:1.2rem}.logo-img[data-astro-cid-3ef6ksr2]{height:28px;width:auto;display:block}.nav-label[data-astro-cid-3ef6ksr2]{font-family:var(--font-heading);font-weight:700;font-size:.9rem;color:var(--green);padding-right:4px;border-right:1px solid var(--gray-200);margin-right:4px}nav[data-astro-cid-3ef6ksr2]{display:flex;align-items:center;gap:28px}.nav-link[data-astro-cid-3ef6ksr2]{font-family:var(--font-heading);font-weight:500;font-size:.9rem;color:var(--gray-700);transition:color .2s}.nav-link[data-astro-cid-3ef6ksr2]:hover,.nav-link[data-astro-cid-3ef6ksr2].active{color:var(--green)}@media(max-width:600px){nav[data-astro-cid-3ef6ksr2]{gap:16px}.nav-link[data-astro-cid-3ef6ksr2]:nth-child(3){display:none}}
 
-.site-header .container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-heading);
-  font-weight: 700;
-  font-size: 1.2rem;
-}
-
-.logo-constellation { color: var(--gray-900); }
-.logo-partners { color: var(--green); }
-
-nav {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-}
-
-.nav-link {
-  font-family: var(--font-heading);
-  font-weight: 500;
-  font-size: 0.9rem;
-  color: var(--gray-700);
-  transition: color 0.2s;
-}
-
-.nav-link:hover, .nav-link.active { color: var(--green); }
-
-@media (max-width: 600px) {
-  nav { gap: 16px; }
-  .nav-link:nth-child(3) { display: none; }
-}
 </style>
